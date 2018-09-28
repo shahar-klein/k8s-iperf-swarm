@@ -23,3 +23,16 @@ spec:
         command: ["/usr/bin/iperf"]
         args: ["-s"]
 
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: iperf-server-service
+spec:
+  selector:
+    app: iperf-server
+  ports:
+  - protocol: TCP
+    port: 5001
+    targetPort: 5001
+
