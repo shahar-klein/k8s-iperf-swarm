@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iperf-server-deployment
+  labels:
+    app: iperf-server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: iperf-server
+  template:
+    metadata:
+      labels:
+        app: iperf-server
+    spec:
+      containers:
+      - name: iperf-server
+        image: shaharklein/ub-iperf:latest
+        ports:
+        - containerPort: 5001
+        env:
+        command: ["/usr/bin/iperf"]
+        args: ["-s"]
+
