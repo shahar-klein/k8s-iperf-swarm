@@ -6,6 +6,44 @@ num_iperf_clients=2
 thread_per_client=4
 time_per_client=10
 
+Usage() {
+	echo "Usage: $0 -s num-servers[default: $num_iperf_servers] -c num-clients[default: $num_iperf_clients] -t num-threads-per-client[default: $thread_per_client] -T run-time[default: $time_per_client]"
+	exit
+}
+
+while getopts ":s:c:t:T:h" opt; do
+  case ${opt} in
+    s )
+      num_iperf_servers=$OPTARG
+      ;;
+    c )
+      num_iperf_clients=$OPTARG
+      ;;
+    t )
+      thread_per_client=$OPTARG
+      ;;
+    T )
+      time_per_client=$OPTARG
+      ;;
+    h )
+	    Usage
+      ;;
+    \? )
+	    Usage
+      ;;
+    : )
+	    Usage
+      ;;
+  esac
+done
+shift $((OPTIND -1))
+
+clear
+echo
+echo
+
+echo "Going to swarm with: $num_iperf_servers Servers, $num_iperf_clients Clients each runing $thread_per_client threads, for $time_per_client Seconds."
+
 #run the server side
 kubectl create -f iperf.yaml
 #resize
