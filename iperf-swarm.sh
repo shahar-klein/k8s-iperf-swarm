@@ -51,25 +51,20 @@ kubectl create -f iperf.yaml
 kubectl scale --current-replicas=3 --replicas=$num_iperf_servers deployment/iperf-server-deployment
 #wait for all up
 echo "Waiting for all iperf servers to come up"
-until [ $(kubectl get deployment iperf-server-deployment | tail -n 1 | awk '{print $5}') -eq $num_iperf_servers ]; 
-do
-        sleep 1
-        echo -n .
-done
-echo
+kubectl wait deployment/iperf-server-deployment --for=condition=available --timeout=120s
 
 #get cluster-ip
 CLUSTER_IP=`kubectl get svc iperf-server-service | tail -n 1 | awk '{print $3}'`
 
 for (( i=0; i<$num_iperf_clients; i++ ))
 do
-        kubectl delete pods iperf$i  
+        kubectl delete --ignore-not-found pods iperf$i  
 done
 
 #run the clients in a loop and wait for them to finish
 for (( i=0; i<$num_iperf_clients; i++ ))
 do 
-        kubectl run iperf$i  --image=shaharklein/ub-iperf:latest --restart=Never -- iperf -c $CLUSTER_IP  -P $thread_per_client -t $time_per_client
+        kubectl run iperf$i  --image=shaharklein/ub-iperf:latest --restart=Never -- iperf -c $CLUSTER_IP  -P $thread_per_client -t $time_per_client -i 1 -o /tmp/iperf.log
 done
 
 echo "Waiting $time_per_client seconds for clients...."
