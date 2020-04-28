@@ -45,6 +45,7 @@ echo
 echo "Going to swarm with: $num_iperf_servers Servers, $num_iperf_clients Clients each runing $thread_per_client threads, for $time_per_client Seconds."
 
 #run the server side
+kubectl delete -f iperf.yaml
 kubectl create -f iperf.yaml
 #resize
 kubectl scale --current-replicas=3 --replicas=$num_iperf_servers deployment/iperf-server-deployment
@@ -59,6 +60,11 @@ echo
 
 #get cluster-ip
 CLUSTER_IP=`kubectl get svc iperf-server-service | tail -n 1 | awk '{print $3}'`
+
+for (( i=0; i<$num_iperf_clients; i++ ))
+do
+        kubectl delete pods iperf$i  
+done
 
 #run the clients in a loop and wait for them to finish
 for (( i=0; i<$num_iperf_clients; i++ ))
