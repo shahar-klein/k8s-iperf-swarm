@@ -15,13 +15,20 @@ spec:
         app: iperf-server
     spec:
       containers:
-      - name: iperf-server
+      - name: iperf-server-tcp
         image: shaharklein/ub-iperf:latest
         ports:
         - containerPort: 5001
         env:
         command: ["/usr/bin/iperf"]
         args: ["-s"]
+      - name: iperf-server-udp
+        image: shaharklein/ub-iperf:latest
+        ports:
+        - containerPort: 5001
+        env:
+        command: ["/usr/bin/iperf"]
+        args: ["-u -s"]
 
 ---
 kind: Service
